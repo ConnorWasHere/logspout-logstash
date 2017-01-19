@@ -54,8 +54,9 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			msg := LogstashMessage{
 				DmsInstance: "dev",
 				Message: m.Data,
-				Docker:  dockerInfo,
 				Stream:  m.Source,
+				ID:  m.Container.ID,
+				Image: m.Container.Config.Image,
 			}
 			if js, err = json.Marshal(msg); err != nil {
 				log.Println("logstash:", err)
@@ -63,7 +64,6 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			}
 		} else {
 			// The message is already in JSON, add the docker specific fields.
-			data["docker"] = dockerInfo
 			if js, err = json.Marshal(data); err != nil {
 				log.Println("logstash:", err)
 				continue
@@ -90,6 +90,7 @@ type DockerInfo struct {
 type LogstashMessage struct {
 	DmsInstance string `json:"dmsInstance"`
 	Message string     `json:"message"`
-	Stream  string     `json:"stream"`
-	Docker  DockerInfo `json:"docker"`
+	Stream string     `json:"stream"`
+	Image string `json:"Image"`
+	ID string `json:"id"`
 }
