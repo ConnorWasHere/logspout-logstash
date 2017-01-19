@@ -52,7 +52,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 		if err := json.Unmarshal([]byte(m.Data), &data); err != nil {
 			// The message is not in JSON, make a new JSON message.
 			msg := LogstashMessage{
-				DmsInstance: "dev",
+				DmsInstance: "devTest",
 				Message: m.Data,
 				Stream:  m.Source,
 				ID:  m.Container.ID,
