@@ -40,13 +40,6 @@ func NewLogstashAdapter(route *router.Route) (router.LogAdapter, error) {
 // Stream implements the router.LogAdapter interface.
 func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 	for m := range logstream {
-		dockerInfo := DockerInfo{
-			Name:     m.Container.Name,
-			ID:       m.Container.ID,
-			Image:    m.Container.Config.Image,
-			Hostname: m.Container.Config.Hostname,
-		}
-
 		var js []byte
 		var data map[string]interface{}
 		if err := json.Unmarshal([]byte(m.Data), &data); err != nil {
@@ -77,13 +70,6 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			log.Fatal("logstash:", err)
 		}
 	}
-}
-
-type DockerInfo struct {
-	Name     string `json:"name"`
-	ID       string `json:"id"`
-	Image    string `json:"image"`
-	Hostname string `json:"hostname"`
 }
 
 // LogstashMessage is a simple JSON input to Logstash.
