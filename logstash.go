@@ -54,24 +54,13 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				newLevel := strings.Split(logMsg, ":")[1]
 				fmt.Println(newLevel)
 			}
-			switch {
-				case logLevel == "DEBUG":
-					if strings.Count(logMsg, "-") == 4{
-						newArray := strings.Split(logMsg)
-					}
-					else{
-						continue
-					}
-					fmt.Println("SWAG")
-				case logLevel == "TRACE":
-					fmt.Println("Good afternoon.")
-				case logLevel == "WARNING":
-					fmt.Println("Good afternoon.")
-				default:
-					fmt.Println("Good evening.")
-			}
-			if Contains(logMsg, "LOGGING LEVEL:"){
-				newLevel := Split(newLevel)
+			if logLevel == "DEBUG"{
+				if strings.Count(logMsg, "-") == 4{
+					newArray := strings.Split(logMsg)
+				}
+				else{
+					continue
+				}
 			}
 			msg := LogstashMessage{
 				IngInstance: "devTest",
