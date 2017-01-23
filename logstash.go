@@ -84,6 +84,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				Image: m.Container.Config.Image,
 			}
 			if skip == false {
+				log.Println("this is working")
 				msg.newMessage = newArray[0]
 				msg.service = newArray[1]
 				msg.timePassed = newArray[3]
