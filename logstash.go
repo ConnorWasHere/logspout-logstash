@@ -57,7 +57,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				logLevel = strings.Split(logMsg, ":")[1]
 			}
 			if logLevel == "DEBUG"{
-				if strings.Count(logMsg, "-") == 4{
+				if strings.Count(logMsg, "-") == 3{
 					//newArray := strings.Split(logMsg, "-")
 					log.Println("WORKING")
 					skip = false
