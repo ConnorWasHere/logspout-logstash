@@ -58,7 +58,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			}
 			if logLevel == "DEBUG"{
 				if strings.Count(logMsg, "-") == 3{
-					newArray := strings.Split(logMsg, "-")
+					newArray = strings.Split(logMsg, "-")
 					skip = false
 				} else {
 					skip = true
@@ -66,7 +66,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			}
 			if logLevel == "WARNING"{
 				if strings.Count(logMsg, "-") == 3 && strings.Contains(logMsg, "WARNING"){
-					newArray := strings.Split(logMsg, "-")
+					newArray = strings.Split(logMsg, "-")
 					skip = false
 				} else {
 					skip = true
@@ -84,17 +84,10 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				Image: m.Container.Config.Image,
 			}
 			if skip == false {
-				msg := LogstashMessage{
-					IngInstance: "devTest",
-					newMessage: newArray[0],
-					service: newArray[1],
-					timePassed: newArray[3],
-					status: newArray[2],
-					Message: m.Data,
-					Stream:  m.Source,
-					ID:  m.Container.ID,
-					Image: m.Container.Config.Image,
-				}
+				msg.newMessage = newArray[0]
+				msg.service = newArray[1]
+				msg.timePassed = newArray[3]
+				msg.status = newArray[2]
 			} 
 			if js, err = json.Marshal(msg); err != nil {
 				log.Println("logstash:", err)
