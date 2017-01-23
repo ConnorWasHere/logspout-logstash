@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log"
 	"net"
-
+	"regexp"
 	"github.com/gliderlabs/logspout/router"
 )
 
@@ -44,8 +44,37 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 		var data map[string]interface{}
 		if err := json.Unmarshal([]byte(m.Data), &data); err != nil {
 			// The message is not in JSON, make a new JSON message.
+			logMsg := m.Data
+			os.Setenv("LOGGING", "DEBUG")
+			logLevel := strings.ToUpper(os.Getenv("LOGGING"))
+			logMsg = strings.Replace(logMsg, "{", "", -1)
+			logMsg = strings.TrimSpace(logMsg)
+			//fmt.Println(strings.Count(logMsg, "-"))
+			if strings.Contains(logMsg, "LOGGING LEVEL:"){
+				newLevel := strings.Split(logMsg, ":")[1]
+				fmt.Println(newLevel)
+			}
+			switch {
+				case logLevel == "DEBUG":
+					if strings.Count(logMsg, "-") == 4{
+						newArray := strings.Split(logMsg)
+					}
+					else{
+						continue
+					}
+					fmt.Println("SWAG")
+				case logLevel == "TRACE":
+					fmt.Println("Good afternoon.")
+				case logLevel == "WARNING":
+					fmt.Println("Good afternoon.")
+				default:
+					fmt.Println("Good evening.")
+			}
+			if Contains(logMsg, "LOGGING LEVEL:"){
+				newLevel := Split(newLevel)
+			}
 			msg := LogstashMessage{
-				DmsInstance: "devTest",
+				IngInstance: "devTest",
 				Message: m.Data,
 				Stream:  m.Source,
 				ID:  m.Container.ID,
@@ -74,7 +103,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 
 // LogstashMessage is a simple JSON input to Logstash.
 type LogstashMessage struct {
-	DmsInstance string `json:"dmsInstance"`
+	IngInstance string `json:"dmsInstance"`
 	Message string     `json:"message"`
 	Stream string     `json:"stream"`
 	Image string `json:"Image"`
