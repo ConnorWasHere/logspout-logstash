@@ -54,11 +54,11 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			logMsg = strings.TrimSpace(logMsg)
 			//fmt.Println(strings.Count(logMsg, "-"))
 			if strings.Contains(logMsg, "LOGGING LEVEL:"){
-				newLevel := strings.Split(logMsg, ":")[1]
+				logLevel = strings.Split(logMsg, ":")[1]
 			}
 			if logLevel == "DEBUG"{
 				if strings.Count(logMsg, "-") == 4{
-					newArray := strings.Split(logMsg, "-")
+					//newArray := strings.Split(logMsg, "-")
 					skip = false
 				} else {
 					log.Println("logstash:")
