@@ -49,7 +49,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 		if err := json.Unmarshal([]byte(m.Data), &data); err != nil {
 			// The message is not in JSON, make a new JSON message.
 			logMsg := m.Data
-			//os.Setenv("LOGGING", "DEBUG")
+			os.Setenv("LOGGING", "DEBUG")
 			logLevel := strings.ToUpper(os.Getenv("LOGGING"))
 			logMsg = strings.Replace(logMsg, "{", "", -1)
 			logMsg = strings.TrimSpace(logMsg)
@@ -74,7 +74,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			}
 			msg := LogstashMessage{
 				IngInstance: "devTest",
-				newMessage: "",
+				newMessage: "swag",
 				service: "",
 				timePassed: "",
 				status: "",
