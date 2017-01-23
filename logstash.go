@@ -54,7 +54,9 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			logMsg = strings.Replace(logMsg, "{", "", -1)
 			logMsg = strings.TrimSpace(logMsg)
 			if strings.Contains(logMsg, "LOGGING LEVEL:"){
+				log.Println(logMsg)
 				logLevel = strings.Split(logMsg, ":")[1]
+				log.Println("GOTTEN HERE")
 				os.Setenv("LOGGING", logLevel)
 				log.Println("New Log Level Set")
 			}
@@ -67,7 +69,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				}
 			}
 			if logLevel == "WARNING"{
-				if strings.Count(logMsg, "-") == 3 && strings.Contains(logMsg, "WARNING"){
+				if strings.Count(logMsg, "-") == 3 && (strings.Contains(logMsg, "WARNING") || strings.Contains(logMsg, "ERROR")){
 					newArray = strings.Split(logMsg, "-")
 					skip = false
 				} else {
@@ -85,7 +87,8 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				ID:  m.Container.ID,
 				Image: m.Container.Config.Image,
 			}
-			if skip == false {
+			if skip == false && logLevel != "TRACE"{
+				log.Println(logLevel)
 				msg.NewMessage = strings.TrimSpace(newArray[0])
 				msg.Service = strings.TrimSpace(newArray[1])
 				msg.TimePassed = strings.TrimSpace(newArray[3])
