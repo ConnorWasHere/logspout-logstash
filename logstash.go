@@ -43,34 +43,59 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 	for m := range logstream {
 		var js []byte
 		var skip bool
+		var newArray []string
 		skip = false
 		var data map[string]interface{}
 		if err := json.Unmarshal([]byte(m.Data), &data); err != nil {
 			// The message is not in JSON, make a new JSON message.
 			logMsg := m.Data
-			os.Setenv("LOGGING", "DEBUG")
+			//os.Setenv("LOGGING", "DEBUG")
 			logLevel := strings.ToUpper(os.Getenv("LOGGING"))
 			logMsg = strings.Replace(logMsg, "{", "", -1)
 			logMsg = strings.TrimSpace(logMsg)
-			//fmt.Println(strings.Count(logMsg, "-"))
 			if strings.Contains(logMsg, "LOGGING LEVEL:"){
 				logLevel = strings.Split(logMsg, ":")[1]
 			}
 			if logLevel == "DEBUG"{
 				if strings.Count(logMsg, "-") == 3{
-					//newArray := strings.Split(logMsg, "-")
-					log.Println("WORKING")
+					newArray = strings.Split(logMsg, "-")
 					skip = false
 				} else {
 					skip = true
 				}
 			}
-			msg := LogstashMessage{
+			if logLevel == "WARNING"{
+				if strings.Count(logMsg, "-") == 3 && strings.Contains(logMsg, "WARNING"){
+					newArray = strings.Split(logMsg, "-")
+					skip = false
+				} else {
+					skip = true
+				}
+			}
+			if skip == true {
+				msg := LogstashMessage{
+					IngInstance: "devTest",
+					newMessage: newArray[0],
+					service: newArray[1],
+					timePassed: newArray[3],
+					status: newArray[2],
+					Message: m.Data,
+					Stream:  m.Source,
+					ID:  m.Container.ID,
+					Image: m.Container.Config.Image,
+				}
+			} else{
+				msg := LogstashMessage{
 				IngInstance: "devTest",
+				newMessage: "",
+				service: "",
+				timePassed: "",
+				status: "",
 				Message: m.Data,
 				Stream:  m.Source,
 				ID:  m.Container.ID,
 				Image: m.Container.Config.Image,
+			}
 			}
 			if js, err = json.Marshal(msg); err != nil {
 				log.Println("logstash:", err)
@@ -97,7 +122,11 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 
 // LogstashMessage is a simple JSON input to Logstash.
 type LogstashMessage struct {
-	IngInstance string `json:"dmsInstance"`
+	IngInstance string `json:"IngInstance"`
+	newMessage string `json:"newMessage"`
+	service string `json:"service"`
+	timePassed string `json:"timePassed"`
+	status string `json:"status"`
 	Message string     `json:"message"`
 	Stream string     `json:"stream"`
 	Image string `json:"Image"`
