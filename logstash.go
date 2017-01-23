@@ -89,7 +89,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				msg.Service = newArray[1]
 				msg.TimePassed = newArray[3]
 				msg.Status = newArray[2]
-				log.Println("this is working:", msg.service)
+				log.Println("this is working:", msg.Service)
 			} 
 			if js, err = json.Marshal(msg); err != nil {
 				log.Println("logstash:", err)
