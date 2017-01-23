@@ -84,11 +84,12 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				Image: m.Container.Config.Image,
 			}
 			if skip == false {
-				log.Println("this is working")
+				log.Println("this is working:", newArray[0])
 				msg.newMessage = newArray[0]
 				msg.service = newArray[1]
 				msg.timePassed = newArray[3]
 				msg.status = newArray[2]
+				log.Println("this is working:", msg.service)
 			} 
 			if js, err = json.Marshal(msg); err != nil {
 				log.Println("logstash:", err)
