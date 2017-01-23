@@ -49,12 +49,14 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 		if err := json.Unmarshal([]byte(m.Data), &data); err != nil {
 			// The message is not in JSON, make a new JSON message.
 			logMsg := m.Data
-			os.Setenv("LOGGING", "DEBUG")
+			//os.Setenv("LOGGING", "DEBUG")
 			logLevel := strings.ToUpper(os.Getenv("LOGGING"))
 			logMsg = strings.Replace(logMsg, "{", "", -1)
 			logMsg = strings.TrimSpace(logMsg)
 			if strings.Contains(logMsg, "LOGGING LEVEL:"){
 				logLevel = strings.Split(logMsg, ":")[1]
+				os.Setenv("LOGGING", logLevel)
+				log.Println("New Log Level Set")
 			}
 			if logLevel == "DEBUG"{
 				if strings.Count(logMsg, "-") == 3{
@@ -74,7 +76,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			}
 			msg := LogstashMessage{
 				IngInstance: "devTest",
-				NewMessage: "swag",
+				NewMessage: "",
 				Service: "",
 				TimePassed: "",
 				Status: "",
@@ -84,12 +86,10 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				Image: m.Container.Config.Image,
 			}
 			if skip == false {
-				log.Println("this is working:", newArray[0])
-				msg.NewMessage = newArray[0]
-				msg.Service = newArray[1]
-				msg.TimePassed = newArray[3]
-				msg.Status = newArray[2]
-				log.Println("this is working:", msg.Service)
+				msg.NewMessage = strings.TrimSpace(newArray[0])
+				msg.Service = strings.TrimSpace(newArray[1])
+				msg.TimePassed = strings.TrimSpace(newArray[3])
+				msg.Status = strings.TrimSpace(newArray[2])
 			} 
 			if js, err = json.Marshal(msg); err != nil {
 				log.Println("logstash:", err)
