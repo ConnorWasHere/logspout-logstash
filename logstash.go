@@ -74,10 +74,10 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			}
 			msg := LogstashMessage{
 				IngInstance: "devTest",
-				newMessage: "swag",
-				service: "",
-				timePassed: "",
-				status: "",
+				NewMessage: "swag",
+				Service: "",
+				TimePassed: "",
+				Status: "",
 				Message: m.Data,
 				Stream:  m.Source,
 				ID:  m.Container.ID,
@@ -85,10 +85,10 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			}
 			if skip == false {
 				log.Println("this is working:", newArray[0])
-				msg.newMessage = newArray[0]
-				msg.service = newArray[1]
-				msg.timePassed = newArray[3]
-				msg.status = newArray[2]
+				msg.NewMessage = newArray[0]
+				msg.Service = newArray[1]
+				msg.TimePassed = newArray[3]
+				msg.Status = newArray[2]
 				log.Println("this is working:", msg.service)
 			} 
 			if js, err = json.Marshal(msg); err != nil {
@@ -117,10 +117,10 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 // LogstashMessage is a simple JSON input to Logstash.
 type LogstashMessage struct {
 	IngInstance string `json:"IngInstance"`
-	newMessage string `json:"newMessage"`
-	service string `json:"service"`
-	timePassed string `json:"timePassed"`
-	status string `json:"status"`
+	NewMessage string `json:"newMessage"`
+	Service string `json:"service"`
+	TimePassed string `json:"timePassed"`
+	Status string `json:"status"`
 	Message string     `json:"message"`
 	Stream string     `json:"stream"`
 	Image string `json:"Image"`
