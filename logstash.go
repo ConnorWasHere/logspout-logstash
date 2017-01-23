@@ -42,6 +42,8 @@ func NewLogstashAdapter(route *router.Route) (router.LogAdapter, error) {
 func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 	for m := range logstream {
 		var js []byte
+		var skip bool
+		skip = false
 		var data map[string]interface{}
 		if err := json.Unmarshal([]byte(m.Data), &data); err != nil {
 			// The message is not in JSON, make a new JSON message.
@@ -57,10 +59,10 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			if logLevel == "DEBUG"{
 				if strings.Count(logMsg, "-") == 4{
 					newArray := strings.Split(logMsg, "-")
-					skip := false
+					skip = false
 				} else {
 					log.Println("logstash:")
-					skip := true
+					skip = true
 				}
 			}
 			msg := LogstashMessage{
