@@ -5,7 +5,8 @@ import (
 	"errors"
 	"log"
 	"net"
-	"regexp"
+	"strings"
+	"os"
 	"github.com/gliderlabs/logspout/router"
 )
 
@@ -52,7 +53,6 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			//fmt.Println(strings.Count(logMsg, "-"))
 			if strings.Contains(logMsg, "LOGGING LEVEL:"){
 				newLevel := strings.Split(logMsg, ":")[1]
-				fmt.Println(newLevel)
 			}
 			if logLevel == "DEBUG"{
 				if strings.Count(logMsg, "-") == 4{
