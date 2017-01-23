@@ -57,9 +57,8 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			if logLevel == "DEBUG"{
 				if strings.Count(logMsg, "-") == 4{
 					newArray := strings.Split(logMsg)
-				}
-				else{
-					continue
+				} else {
+					log.Println("logstash:")
 				}
 			}
 			msg := LogstashMessage{
