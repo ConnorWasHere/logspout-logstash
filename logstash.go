@@ -59,9 +59,9 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			if logLevel == "DEBUG"{
 				if strings.Count(logMsg, "-") == 4{
 					//newArray := strings.Split(logMsg, "-")
+					log.Println("WORKING")
 					skip = false
 				} else {
-					log.Println("logstash:")
 					skip = true
 				}
 			}
@@ -87,7 +87,6 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 		// to work with tls and tcp transports via json_lines codec
 		js = append(js, byte('\n'))
 		if skip == true {
-			log.Println("logstash SWAG")
 			continue
 		}
 		if _, err := a.conn.Write(js); err != nil {
