@@ -88,7 +88,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				ID:  m.Container.ID,
 				Image: m.Container.Config.Image,
 			}
-			if skip == false && logLevel != "TRACE"{
+			if skip == false && logLevel == "TRACE"{
 				log.Println(logLevel)
 				msg.NewMessage = strings.TrimSpace(newArray[0])
 				msg.Service = strings.TrimSpace(newArray[1])
