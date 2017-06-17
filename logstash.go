@@ -76,7 +76,12 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					skip = true
 				}
 			}
+			log.Println("WORKING")
 			log.Println(m.Container.Config.Image)
+			log.Println(m.Source)
+			log.Println(m.Container.ID)
+			log.Println(m.Data)
+			log.Println("DONE")
 			msg := LogstashMessage{
 				IngInstance: "devTest",
 				NewMessage: "ayy",
