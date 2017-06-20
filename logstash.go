@@ -82,7 +82,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					msg.Status = newArray[3]
 				}
 				//finalCut := strings.Split(newArray[1], " ")
-			} else if strings.Contains(m.Container.Config.Image, "core_ing") || strings.Contains(m.Container.Config.Image, "archive_ing") {
+			} else if strings.Contains(m.Container.Config.Image, "core_server") || strings.Contains(m.Container.Config.Image, "archive_ing") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
 				}
@@ -96,7 +96,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					msg.NewMessage = message
 					msg.Service = serv
 					msg.TimePassed = timestamp
-					msg.Status = "NO"
+					msg.Status = "N/A"
 				}
 			} else if strings.Contains(m.Container.Config.Image, "vnv_spring") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
@@ -148,8 +148,6 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				if strings.LastIndex(logMsg,"]") > -1 {
 					logMsg = strings.TrimSpace(logMsg[strings.LastIndex(logMsg,"]")+1:len(logMsg)])
 					newArray = strings.Split(logMsg, " ")
-					log.Println(newArray[0])
-					log.Println(newArray[1])
 					if _, err := strconv.Atoi(strings.TrimSpace(newArray[0])); err == nil {
 						msg.NewMessage = newArray[1] + " " + newArray[2]
 						msg.Service = "exec_gateway"
