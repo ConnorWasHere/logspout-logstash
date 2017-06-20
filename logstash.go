@@ -131,7 +131,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					log.Println(logMsg)
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
 				}
-				timestamp := logMsg[0:strings.Index(logMsg,"[")-4]
+				timestamp := logMsg[0:strings.Index(logMsg,"[")-5]
 				message := logMsg[strings.LastIndex(logMsg,"]")+1:len(logMsg)]
 				msg.NewMessage = message
 				msg.Service = "exec_server"
@@ -144,6 +144,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				}
 				logMsg = logMsg[strings.LastIndex(logMsg,"]")+1:len(logMsg)]
 				newArray = strings.Split(logMsg, " ")
+				log.Println(newArray[0])
 				if _, err := strconv.Atoi(newArray[0]); err == nil {
 					msg.NewMessage = newArray[1] + " " + newArray[2]
 					msg.Service = "exec_gateway"
