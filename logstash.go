@@ -90,9 +90,14 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				if strings.Contains(m.Container.Config.Image, "core_ing") {
 					serv = "core"
 				}
+				log.Println("HERE")
+				log.Println(logMsg)
 				if strings.Index(logMsg,":") > -1 && strings.Index(logMsg,"-") > -1 {
 					timestamp := logMsg[strings.Index(logMsg,":")+1:strings.Index(logMsg,"-")-1]
 					message := logMsg[strings.Index(logMsg,"-")+1:len(logMsg)]
+					log.Println(strings.Index(logMsg,":"))
+					log.Println(timestamp)
+					log.Println(message)
 					msg.NewMessage = message
 					msg.Service = serv
 					msg.TimePassed = timestamp
