@@ -98,7 +98,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					msg.TimePassed = timestamp
 					msg.Status = "N/A"
 				}
-			} else if strings.Contains(m.Container.Config.Image, "vnv_spring") {
+			} else if strings.Contains(m.Container.Config.Image, "vnvspring") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
 					currentStatus.VnvSpring = strings.Split(logMsg, ":")[1]
 				}
@@ -129,7 +129,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					msg.Status = strings.TrimSpace(newArray[2])
 				} 
 
-			} else if strings.Contains(m.Container.Config.Image, "ingenium-exec-server") {
+			} else if strings.Contains(m.Container.Config.Image, "exec_server") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
 					log.Println(logMsg)
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
@@ -140,7 +140,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				msg.Service = "exec_server"
 				msg.TimePassed = timestamp
 				msg.Status = "N/A"
-			} else if strings.Contains(m.Container.Config.Image, "ingenium-exec-gateway") {
+			} else if strings.Contains(m.Container.Config.Image, "exec_gateway") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
 					log.Println(logMsg)
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
