@@ -6,7 +6,6 @@ import (
 	"log"
 	"net"
 	"strings"
-	"os"
 	"strconv"
 	"github.com/gliderlabs/logspout/router"
 )
