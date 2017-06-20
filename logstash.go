@@ -75,11 +75,12 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
 				}
 				newArray = strings.Split(logMsg, " ")
-
-				msg.NewMessage = newArray[2]
-				msg.Service = "UI"
-				msg.TimePassed = newArray[4]
-				msg.Status = newArray[3]
+				if len(newArray) > 4 {
+					msg.NewMessage = newArray[2]
+					msg.Service = "UI"
+					msg.TimePassed = newArray[4]
+					msg.Status = newArray[3]
+				}
 				//finalCut := strings.Split(newArray[1], " ")
 			} else if strings.Contains(m.Container.Config.Image, "core_ing") || strings.Contains(m.Container.Config.Image, "archive_ing") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
@@ -89,12 +90,14 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				if strings.Contains(m.Container.Config.Image, "core_ing") {
 					serv = "core"
 				}
-				timestamp := logMsg[strings.Index(logMsg,":")+1:strings.Index(logMsg,"-")-1]
-				message := logMsg[strings.Index(logMsg,"-")+1:len(logMsg)]
-				msg.NewMessage = message
-				msg.Service = serv
-				msg.TimePassed = timestamp
-				msg.Status = "NO"
+				if strings.Index(logMsg,":") > -1 && strings.Index(logMsg,"-") > -1 {
+					timestamp := logMsg[strings.Index(logMsg,":")+1:strings.Index(logMsg,"-")-1]
+					message := logMsg[strings.Index(logMsg,"-")+1:len(logMsg)]
+					msg.NewMessage = message
+					msg.Service = serv
+					msg.TimePassed = timestamp
+					msg.Status = "NO"
+				}
 			} else if strings.Contains(m.Container.Config.Image, "vnv_spring") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
 					currentStatus.VnvSpring = strings.Split(logMsg, ":")[1]
@@ -136,22 +139,27 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				msg.NewMessage = message
 				msg.Service = "exec_server"
 				msg.TimePassed = timestamp
-				msg.Status = "YES"
+				msg.Status = "N/A"
 			} else if strings.Contains(m.Container.Config.Image, "ingenium-exec-gateway") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
 					log.Println(logMsg)
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
 				}
-				logMsg = logMsg[strings.LastIndex(logMsg,"]")+1:len(logMsg)]
-				newArray = strings.Split(logMsg, " ")
-				log.Println(newArray[0])
-				if _, err := strconv.Atoi(newArray[0]); err == nil {
-					msg.NewMessage = newArray[1] + " " + newArray[2]
-					msg.Service = "exec_gateway"
-					msg.TimePassed = newArray[4]
-					msg.Status = newArray[0]
+				if strings.LastIndex(logMsg,"]") > -1 {
+					logMsg = logMsg[strings.LastIndex(logMsg,"]")+1:len(logMsg)]
+					log.Println(logMsg)
+					newArray = strings.Split(logMsg, " ")
+
+					if _, err := strconv.Atoi(newArray[0]); err == nil {
+						msg.NewMessage = newArray[1] + " " + newArray[2]
+						msg.Service = "exec_gateway"
+						msg.TimePassed = newArray[4]
+						msg.Status = newArray[0]
+					}
 				}
-			} 
+			} else {
+				continue
+			}
 			if js, err = json.Marshal(msg); err != nil {
 				log.Println("logstash:", err)
 				continue
