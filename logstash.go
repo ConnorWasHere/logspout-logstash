@@ -147,10 +147,9 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				}
 				if strings.LastIndex(logMsg,"]") > -1 {
 					logMsg = logMsg[strings.LastIndex(logMsg,"]")+1:len(logMsg)]
-					log.Println(logMsg)
 					newArray = strings.Split(logMsg, " ")
-
-					if _, err := strconv.Atoi(newArray[0]); err == nil {
+					log.Println(strings.TrimSpace(newArray[0]))
+					if _, err := strconv.Atoi(strings.TrimSpace(newArray[0])); err == nil {
 						msg.NewMessage = newArray[1] + " " + newArray[2]
 						msg.Service = "exec_gateway"
 						msg.TimePassed = newArray[4]
