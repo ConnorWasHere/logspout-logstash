@@ -7,6 +7,7 @@ import (
 	"net"
 	"strings"
 	"os"
+	"strconv"
 	"github.com/gliderlabs/logspout/router"
 )
 
@@ -37,9 +38,18 @@ func NewLogstashAdapter(route *router.Route) (router.LogAdapter, error) {
 		conn:  conn,
 	}, nil
 }
-
+//DEBUG: 2017-06-16T18:40:06.320Z - apiPath: /venues
+//ui.1.vl9tj11p2xbt0f1yrr3ix8dwb|[16/Jun/2017 11:40:01] "GET /static/jpl_theme/lib/bootstrap-3.3.7/css/bootstrap.min.css HTTP/1.1" 200 123366
 // Stream implements the router.LogAdapter interface.
 func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
+	currentStatus := ServiceStatus{
+		Coreing: "DEBUG",
+		Archiveing: "DEBUG",
+		Ui: "DEBUG",
+		VnvSpring: "DEBUG",
+		Execgateway: "DEBUG",
+		Execserver: "DEBUG",
+	}
 	for m := range logstream {
 		var js []byte
 		var skip bool
@@ -50,55 +60,103 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			// The message is not in JSON, make a new JSON message.
 			logMsg := m.Data
 			//os.Setenv("LOGGING", "DEBUG")
-			logLevel := strings.ToUpper(os.Getenv("LOGGING"))
-			logMsg = strings.Replace(logMsg, "{", "", -1)
-			logMsg = strings.TrimSpace(logMsg)
-			if strings.Contains(logMsg, "LOGGING LEVEL:"){
-				log.Println(logMsg)
-				logLevel = strings.Split(logMsg, ":")[1]
-				log.Println("GOTTEN HERE")
-				os.Setenv("LOGGING", logLevel)
-				log.Println("New Log Level Set")
-			}
-			if logLevel == "DEBUG"{
-				if strings.Count(logMsg, "-") == 3{
-					newArray = strings.Split(logMsg, "-")
-					skip = false
-				} else {
-					skip = true
-				}
-			}
-			if logLevel == "WARNING"{
-				if strings.Count(logMsg, "-") == 3 && (strings.Contains(logMsg, "WARNING") || strings.Contains(logMsg, "ERROR")){
-					newArray = strings.Split(logMsg, "-")
-					skip = false
-				} else {
-					skip = true
-				}
-			}
-			log.Println("WORKING")
-			log.Println(m.Container.Config.Image)
-			log.Println(m.Source)
-			log.Println(m.Container.ID)
-			log.Println(m.Data)
-			log.Println("DONE")
 			msg := LogstashMessage{
-				IngInstance: "devTest",
-				NewMessage: "ayy",
-				Service: "lmao",
-				TimePassed: "no",
-				Status: "gg no re",
+				IngInstance: "",
+				NewMessage: "",
+				Service: "",
+				TimePassed: "",
+				Status: "",
 				Message: m.Data,
 				Stream:  m.Source,
 				ID:  m.Container.ID,
 				Image: m.Container.Config.Image,
 			}
-			if skip == false && logLevel == "TRACE"{
-				log.Println(logLevel)
-				msg.NewMessage = strings.TrimSpace(newArray[0])
-				msg.Service = strings.TrimSpace(newArray[1])
-				msg.TimePassed = strings.TrimSpace(newArray[3])
-				msg.Status = strings.TrimSpace(newArray[2])
+			if strings.Contains(m.Container.Config.Image, "ui") {
+				if strings.Contains(logMsg, "LOGGING LEVEL:"){
+					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
+				}
+				newArray = strings.Split(logMsg, " ")
+				msg := LogstashMessage{
+					IngInstance: "Ingenium",
+					NewMessage: newArray[2],
+					Service: "UI",
+					TimePassed: newArray[4],
+					Status: newArray[3],
+					Message: m.Data,
+					Stream:  m.Source,
+					ID:  m.Container.ID,
+					Image: m.Container.Config.Image,
+				}
+				//finalCut := strings.Split(newArray[1], " ")
+			} else if strings.Contains(m.Container.Config.Image, "core_ing") || strings.Contains(m.Container.Config.Image, "archive_ing") {
+				if strings.Contains(logMsg, "LOGGING LEVEL:"){
+					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
+				}
+				serv := "archive"
+				if strings.Contains(m.Container.Config.Image, "core_ing") {
+					serv = "core"
+				}
+				timestamp := logMsg[strings.Index(logMsg,":")+1:strings.Index(logMsg,"-")-1]
+				message := logMsg[strings.Index(logMsg,"-")+1:len(logMsg)]
+				msg.NewMessage = message
+				msg.Service = serv
+				msg.TimePassed = timestamp
+				msg.Status = "NO"
+			} else if strings.Contains(m.Container.Config.Image, "vnv_spring") {
+				if strings.Contains(logMsg, "LOGGING LEVEL:"){
+					currentStatus.VnvSpring = strings.Split(logMsg, ":")[1]
+				}
+				logMsg = strings.Replace(logMsg, "{", "", -1)
+				logMsg = strings.TrimSpace(logMsg)
+
+				if currentStatus.VnvSpring == "DEBUG"{
+					if strings.Count(logMsg, "-") == 3{
+						newArray = strings.Split(logMsg, "-")
+						skip = false
+					} else {
+						skip = true
+					}
+				}
+				if currentStatus.VnvSpring == "WARNING"{
+					if strings.Count(logMsg, "-") == 3 && (strings.Contains(logMsg, "WARNING") || strings.Contains(logMsg, "ERROR")){
+						newArray = strings.Split(logMsg, "-")
+						skip = false
+					} else {
+						skip = true
+					}
+				}
+				if skip == false && currentStatus.VnvSpring != "TRACE"{
+					log.Println(currentStatus.VnvSpring)
+					msg.NewMessage = strings.TrimSpace(newArray[0])
+					msg.Service = strings.TrimSpace(newArray[1])
+					msg.TimePassed = strings.TrimSpace(newArray[3])
+					msg.Status = strings.TrimSpace(newArray[2])
+				} 
+
+			} else if strings.Contains(m.Container.Config.Image, "exec_server") {
+				if strings.Contains(logMsg, "LOGGING LEVEL:"){
+					log.Println(logMsg)
+					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
+				}
+				timestamp := logMsg[0:strings.Index(logMsg,"[")-4]
+				message := logMsg[strings.LastIndex(logMsg,"]")+1:len(logMsg)]
+				msg.NewMessage = message
+				msg.Service = "exec_server"
+				msg.TimePassed = timestamp
+				msg.Status = "YES"
+			} else if strings.Contains(m.Container.Config.Image, "exec_gateway") {
+				if strings.Contains(logMsg, "LOGGING LEVEL:"){
+					log.Println(logMsg)
+					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
+				}
+				logMsg = logMsg[strings.LastIndex(logMsg,"]")+1:len(logMsg)]
+				newArray = strings.Split(logMsg, " ")
+				if _, err := strconv.Atoi(newArray[0]); err == nil {
+					msg.NewMessage = newArray[1] + " " + newArray[2]
+					msg.Service = "exec_gateway"
+					msg.TimePassed = newArray[4]
+					msg.Status = newArray[0]
+				}
 			} 
 			if js, err = json.Marshal(msg); err != nil {
 				log.Println("logstash:", err)
@@ -124,6 +182,15 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 }
 
 // LogstashMessage is a simple JSON input to Logstash.
+type ServiceStatus struct {
+	Coreing string
+	Archiveing string
+	Ui string
+	VnvSpring string
+	Execgateway string
+	Execserver string
+}
+
 type LogstashMessage struct {
 	IngInstance string `json:"IngInstance"`
 	NewMessage string `json:"newMessage"`
