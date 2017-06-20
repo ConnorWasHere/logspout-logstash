@@ -60,7 +60,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			logMsg := m.Data
 			//os.Setenv("LOGGING", "DEBUG")
 			msg := LogstashMessage{
-				IngInstance: "",
+				IngInstance: "Ingenium",
 				NewMessage: "",
 				Service: "",
 				TimePassed: "",
@@ -75,17 +75,11 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
 				}
 				newArray = strings.Split(logMsg, " ")
-				msg := LogstashMessage{
-					IngInstance: "Ingenium",
-					NewMessage: newArray[2],
-					Service: "UI",
-					TimePassed: newArray[4],
-					Status: newArray[3],
-					Message: m.Data,
-					Stream:  m.Source,
-					ID:  m.Container.ID,
-					Image: m.Container.Config.Image,
-				}
+
+				msg.NewMessage = newArray[2]
+				msg.Service = "UI"
+				msg.TimePassed = newArray[4]
+				msg.Status = newArray[3]
 				//finalCut := strings.Split(newArray[1], " ")
 			} else if strings.Contains(m.Container.Config.Image, "core_ing") || strings.Contains(m.Container.Config.Image, "archive_ing") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
