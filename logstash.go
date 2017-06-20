@@ -75,7 +75,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
 				}
 				newArray = strings.Split(logMsg, " ")
-				if len(newArray) > 4 {
+				if len(newArray) > 7 {
 					msg.NewMessage = newArray[2]
 					msg.Service = "UI"
 					msg.TimePassed = newArray[7]
