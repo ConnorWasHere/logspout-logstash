@@ -146,9 +146,10 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
 				}
 				if strings.LastIndex(logMsg,"]") > -1 {
-					logMsg = logMsg[strings.LastIndex(logMsg,"]")+1:len(logMsg)]
+					logMsg = strings.TrimSpace(logMsg[strings.LastIndex(logMsg,"]")+1:len(logMsg)])
 					newArray = strings.Split(logMsg, " ")
-					log.Println(strings.TrimSpace(newArray[0]))
+					log.Println(newArray[0])
+					log.Println(newArray[1])
 					if _, err := strconv.Atoi(strings.TrimSpace(newArray[0])); err == nil {
 						msg.NewMessage = newArray[1] + " " + newArray[2]
 						msg.Service = "exec_gateway"
