@@ -87,7 +87,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
 				}
 				serv := "archive"
-				if strings.Contains(m.Container.Config.Image, "core_ing") {
+				if strings.Contains(m.Container.Config.Image, "core_server") {
 					serv = "core"
 				}
 				log.Println("HERE")
