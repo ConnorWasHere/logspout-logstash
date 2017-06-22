@@ -37,8 +37,7 @@ func NewLogstashAdapter(route *router.Route) (router.LogAdapter, error) {
 		conn:  conn,
 	}, nil
 }
-//DEBUG: 2017-06-16T18:40:06.320Z - apiPath: /venues
-//ui.1.vl9tj11p2xbt0f1yrr3ix8dwb|[16/Jun/2017 11:40:01] "GET /static/jpl_theme/lib/bootstrap-3.3.7/css/bootstrap.min.css HTTP/1.1" 200 123366
+
 // Stream implements the router.LogAdapter interface.
 func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 	currentStatus := ServiceStatus{
@@ -75,11 +74,11 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
 				}
 				newArray = strings.Split(logMsg, " ")
-				if len(newArray) > 7 {
-					msg.NewMessage = newArray[2]
+				if len(newArray) > 6 {
+					msg.NewMessage = newArray[2] + " " + newArray[3] + " " + newArray[4]
 					msg.Service = "UI"
-					msg.TimePassed = newArray[7]
-					msg.Status = newArray[6]
+					msg.TimePassed = newArray[6]
+					msg.Status = newArray[5]
 				}
 				//finalCut := strings.Split(newArray[1], " ")
 			} else if strings.Contains(m.Container.Config.Image, "core_server") || strings.Contains(m.Container.Config.Image, "archive_ing") {
@@ -134,12 +133,14 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					log.Println(logMsg)
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
 				}
-				timestamp := logMsg[0:strings.Index(logMsg,"[")-5]
-				message := logMsg[strings.LastIndex(logMsg,"]")+1:len(logMsg)]
-				msg.NewMessage = message
-				msg.Service = "exec_server"
-				msg.TimePassed = timestamp
-				msg.Status = "N/A"
+				if strings.Index(logMsg,"[")-5 > 0 && strings.LastIndex(logMsg,"]")+1 > 0 {
+					timestamp := logMsg[0:strings.Index(logMsg,"[")-5]
+					message := logMsg[strings.LastIndex(logMsg,"]")+1:len(logMsg)]
+					msg.NewMessage = message
+					msg.Service = "exec_server"
+					msg.TimePassed = timestamp
+					msg.Status = "N/A"
+				}
 			} else if strings.Contains(m.Container.Config.Image, "exec_gateway") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
 					log.Println(logMsg)
