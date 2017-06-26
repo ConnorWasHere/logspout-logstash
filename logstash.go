@@ -7,7 +7,9 @@ import (
 	"net"
 	"strings"
 	"strconv"
+	"time"
 	"github.com/gliderlabs/logspout/router"
+    "time"
 )
 
 func init() {
@@ -53,6 +55,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 		var skip bool
 		var newArray []string
 		skip = false
+		CurrentTime := time.Now()
 		var data map[string]interface{}
 		if err := json.Unmarshal([]byte(m.Data), &data); err != nil {
 			// The message is not in JSON, make a new JSON message.
@@ -68,13 +71,14 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				Stream:  m.Source,
 				ID:  m.Container.ID,
 				Image: m.Container.Config.Image,
+				Timestamp: strconv.Itoa(CurrentTime.YearDay()) + "-" + strconv.Itoa(CurrentTime.Year()),
 			}
 			if strings.Contains(m.Container.Config.Image, "ui") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
 				}
 				newArray = strings.Split(logMsg, " ")
-				if len(newArray) > 6 {
+				if len(newArray) > 6 && _, err := strconv.Atoi(strings.TrimSpace(newArray[5])); err == nil {
 					msg.NewMessage = newArray[2] + " " + newArray[3] + " " + newArray[4]
 					msg.Service = "UI"
 					msg.TimePassed = newArray[6]
@@ -202,4 +206,5 @@ type LogstashMessage struct {
 	Stream string     `json:"stream"`
 	Image string `json:"Image"`
 	ID string `json:"id"`
+	Timestamp string `json:"timestamp"`
 }
