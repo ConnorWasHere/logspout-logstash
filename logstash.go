@@ -70,9 +70,8 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				Stream:  m.Source,
 				ID:  m.Container.ID,
 				Image: m.Container.Config.Image,
-				Timestamp: strconv.Itoa(CurrentTime.YearDay()) + "-" + strconv.Itoa(CurrentTime.Year()),
+				Timestamp: "ingenium-" + strconv.Itoa(CurrentTime.YearDay()) + "-" + strconv.Itoa(CurrentTime.Year()),
 			}
-			log.Println(msg.Timestamp)
 			if strings.Contains(m.Container.Config.Image, "ui") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
@@ -102,8 +101,6 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					msg.Service = serv
 					msg.TimePassed = timestamp
 					msg.Status = "N/A"
-					log.Println("SWAG")
-					log.Println(msg.Timestamp)
 				}
 			} else if strings.Contains(m.Container.Config.Image, "vnvspring") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
