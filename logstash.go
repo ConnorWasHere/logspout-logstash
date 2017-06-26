@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"time"
 	"github.com/gliderlabs/logspout/router"
-    "time"
 )
 
 func init() {
@@ -78,11 +77,13 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
 				}
 				newArray = strings.Split(logMsg, " ")
-				if len(newArray) > 6 && _, err := strconv.Atoi(strings.TrimSpace(newArray[5])); err == nil {
-					msg.NewMessage = newArray[2] + " " + newArray[3] + " " + newArray[4]
-					msg.Service = "UI"
-					msg.TimePassed = newArray[6]
-					msg.Status = newArray[5]
+				if len(newArray) > 6 {
+					if _, err := strconv.Atoi(strings.TrimSpace(newArray[5])); err == nil {
+						msg.NewMessage = newArray[2] + " " + newArray[3] + " " + newArray[4]
+						msg.Service = "UI"
+						msg.TimePassed = newArray[6]
+						msg.Status = newArray[5]
+					}
 				}
 				//finalCut := strings.Split(newArray[1], " ")
 			} else if strings.Contains(m.Container.Config.Image, "core_server") || strings.Contains(m.Container.Config.Image, "archive_ing") {
