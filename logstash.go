@@ -70,7 +70,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				Stream:  m.Source,
 				ID:  m.Container.ID,
 				Image: m.Container.Config.Image,
-				Timestamp: "ingenium-" + strconv.Itoa(CurrentTime.YearDay()) + "-" + strconv.Itoa(CurrentTime.Year()),
+				Timestamp: "ingenium_" + strconv.Itoa(CurrentTime.Year()) + "." + strconv.Itoa(int(CurrentTime.Month())) + "." + strconv.Itoa(CurrentTime.Day()),
 			}
 			if strings.Contains(m.Container.Config.Image, "ui") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
