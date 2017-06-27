@@ -61,10 +61,11 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			logMsg := m.Data
 			//os.Setenv("LOGGING", "DEBUG")
 			month := int(CurrentTime.Month())
+			var monthStr string
 			if month < 10 {
-				monthStr := "0" + strconv.Itoa(month)
+				monthStr = "0" + strconv.Itoa(month)
 			} else{
-				monthStr := strconv.Itoa(month)
+				monthStr = strconv.Itoa(month)
 			}
 			msg := LogstashMessage{
 				IngInstance: "Ingenium",
