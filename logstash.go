@@ -67,6 +67,14 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 			} else{
 				monthStr = strconv.Itoa(month)
 			}
+
+			day := int(CurrentTime.Day())
+			var dayStr string
+			if month < 10 {
+				dayStr = "0" + strconv.Itoa(day)
+			} else{
+				dayStr = strconv.Itoa(day)
+			}
 			msg := LogstashMessage{
 				IngInstance: "Ingenium",
 				NewMessage: "",
@@ -77,7 +85,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				Stream:  m.Source,
 				ID:  m.Container.ID,
 				Image: m.Container.Config.Image,
-				Timestamp: "ingenium_" + strconv.Itoa(CurrentTime.Year()) + "." + monthStr + "." + strconv.Itoa(CurrentTime.Day()),
+				Timestamp: "ingenium_" + strconv.Itoa(CurrentTime.Year()) + "." + monthStr + "." + dayStr),
 			}
 			if strings.Contains(m.Container.Config.Image, "ui") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
@@ -101,14 +109,14 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				if strings.Contains(m.Container.Config.Image, "core_server") {
 					serv = "core"
 				}
-				if strings.Index(logMsg,":") > -1 && strings.Index(logMsg,"-") > -1 {
-					timestamp := logMsg[strings.Index(logMsg,":")+1:strings.Index(logMsg,"-")-1]
-					message := logMsg[strings.Index(logMsg,"-")+1:len(logMsg)]
-					msg.NewMessage = message
-					msg.Service = serv
-					msg.TimePassed = timestamp
-					msg.Status = "N/A"
-				}
+				// if strings.Index(logMsg,":") > -1 && strings.Index(logMsg,"-") > -1 {
+				// 	timestamp := logMsg[strings.Index(logMsg,":")+1:strings.Index(logMsg,"-")-1]
+				// 	message := logMsg[strings.Index(logMsg,"-")+1:len(logMsg)]
+				// 	msg.NewMessage = message
+				// 	msg.Service = serv
+				// 	msg.TimePassed = timestamp
+				// 	msg.Status = "N/A"
+				// }
 			} else if strings.Contains(m.Container.Config.Image, "vnvspring") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
 					currentStatus.VnvSpring = strings.Split(logMsg, ":")[1]
