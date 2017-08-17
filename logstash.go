@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"time"
 	"github.com/gliderlabs/logspout/router"
-	"reflect"
 )
 
 func init() {
@@ -110,7 +109,9 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				// if strings.Contains(m.Container.Config.Image, "core_server") {
 				// 	serv = "core"
 				// }
-				log.Println(reflect.TypeOf(m.Data))
+				m.Data = strings.Replace(m.Data,"\n"," ",-1)
+				m.Data = strings.Replace(m.Data,"\r"," ",-1)
+				log.Println(m.Data)
 				// if strings.Index(logMsg,":") > -1 && strings.Index(logMsg,"-") > -1 {
 				// 	timestamp := logMsg[strings.Index(logMsg,":")+1:strings.Index(logMsg,"-")-1]
 				// 	message := logMsg[strings.Index(logMsg,"-")+1:len(logMsg)]
