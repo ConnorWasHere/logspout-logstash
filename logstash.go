@@ -85,7 +85,7 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				Stream:  m.Source,
 				ID:  m.Container.ID,
 				Image: m.Container.Config.Image,
-				Timestamp: "ingenium_" + strconv.Itoa(CurrentTime.Year()) + "." + monthStr + "." + dayStr),
+				Timestamp: "ingenium_" + strconv.Itoa(CurrentTime.Year()) + "." + monthStr + "." + dayStr,
 			}
 			if strings.Contains(m.Container.Config.Image, "ui") {
 				if strings.Contains(logMsg, "LOGGING LEVEL:"){
@@ -102,13 +102,14 @@ func (a *LogstashAdapter) Stream(logstream chan *router.Message) {
 				}
 				//finalCut := strings.Split(newArray[1], " ")
 			} else if strings.Contains(m.Container.Config.Image, "core_server") || strings.Contains(m.Container.Config.Image, "archive_ing") {
-				if strings.Contains(logMsg, "LOGGING LEVEL:"){
-					currentStatus.Coreing = strings.Split(logMsg, ":")[1]
-				}
-				serv := "archive"
-				if strings.Contains(m.Container.Config.Image, "core_server") {
-					serv = "core"
-				}
+				// if strings.Contains(logMsg, "LOGGING LEVEL:"){
+				// 	currentStatus.Coreing = strings.Split(logMsg, ":")[1]
+				// }
+				// serv := "archive"
+				// if strings.Contains(m.Container.Config.Image, "core_server") {
+				// 	serv = "core"
+				// }
+				log.Println(m.Data)
 				// if strings.Index(logMsg,":") > -1 && strings.Index(logMsg,"-") > -1 {
 				// 	timestamp := logMsg[strings.Index(logMsg,":")+1:strings.Index(logMsg,"-")-1]
 				// 	message := logMsg[strings.Index(logMsg,"-")+1:len(logMsg)]
